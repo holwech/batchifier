@@ -1,0 +1,31 @@
+
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>WhatsApp Backup Fixer</title>
+  <meta name="description" content="WhatsApp Backup Fixer">
+  <meta name="author" content="Joachim Holwech">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <h3>Choose the local(s) zip file(s)</h3>
+    <p class="note">Note : your browser will process the zip file, don't choose a file too big !</p>
+    <input type="file" id="file" name="file" multiple /><br />
+
+    <div id="result_block" class="hidden">
+    <h3>Content :</h3>
+    <div id="result"></div>
+    </div>
+    <script
+        src="https://code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous">
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.5/jszip.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/piexifjs@2.0.0-beta.7/dist/piexif.min.js"></script>
+    <script src="file-converter.js"></script>
+</body>
+</html>
