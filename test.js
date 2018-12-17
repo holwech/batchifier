@@ -1,3 +1,18 @@
+zip.workerScriptsPath = '/lib/';
+// create the blob object storing the data to compress
+var blob = new Blob([ "Lorem ipsum dolor sit amet, consectetuer adipiscing elit..." ], {
+  type : "text/plain"
+});
+// creates a zip storing the file "lorem.txt" with blob as data
+// the zip will be stored into a Blob object (zippedBlob)
+zipBlob("lorem.txt", blob, function(zippedBlob) {
+  // unzip the first file from zipped data stored in zippedBlob
+  unzipBlob(zippedBlob, function(unzippedBlob) {
+    // logs the uncompressed Blob
+    console.log(unzippedBlob);
+  });
+});
+
 function zipBlob(filename, blob, callback) {
   // use a zip.BlobWriter object to write zipped data into a Blob object
   zip.createWriter(new zip.BlobWriter("application/zip"), function(zipWriter) {
@@ -26,33 +41,4 @@ function unzipBlob(blob, callback) {
 
 function onerror(message) {
   console.error(message);
-}
-// --------------------------------------
-// Check for the various File API support.
-if (window.File && window.FileReader && window.FileList && window.Blob) {
-  // Great success! All the File APIs are supported.
-} else {
-  alert('The File APIs are not fully supported in this browser.');
-}
-
-function handleFile(e) {
-  let file = e.target.files[0]
-  zipBlob("lorem.txt", file, function(zippedBlob) {
-    // unzip the first file from zipped data stored in zippedBlob
-    unzipBlob(zippedBlob, function(unzippedBlob) {
-      // logs the uncompressed Blob
-
-      let reader = new FileReader();
-      reader.addEventListener('loadend', (e) => {
-        const text = e.srcElement.result;
-        console.log(text);
-      });
-      reader.readAsText(unzippedBlob);
-    });
-  });
-}
-
-window.onload = function() {
-  zip.workerScriptsPath = '/lib/';
-  document.getElementById('file').addEventListener('change', handleFile, false);
 }

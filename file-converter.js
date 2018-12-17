@@ -1,4 +1,5 @@
-function handleFile(file) {
+function handleFile(e) {
+    let file = e.target.files[0];
     let reader = new FileReader();
     reader.onload = function() {
         let blob = reader.result;
@@ -7,14 +8,6 @@ function handleFile(file) {
     reader.readAsArrayBuffer(file)
 }
 
-function handleFiles(e) {
-    let files = e.target.files;
-    for (let i = 0; i < files.length; i++) {
-        handleFile(files[i]);
-    }
-}
-
 window.onload = function() {
-    zip.workerScriptsPath = 'lib/';
-    document.getElementById('file').addEventListener('change', handleFiles);
+    document.getElementById('file').addEventListener('change', handleFile, false);
 }
