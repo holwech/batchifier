@@ -72,5 +72,6 @@ function handleFiles(e) {
 }
 
 window.onload = function() {
+  zip.workerScriptsPath = './lib/';
   document.getElementById('#result').addEventListener('change', handleFile);
 }
