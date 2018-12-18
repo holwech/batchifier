@@ -63,7 +63,7 @@ function getFilename(entry) {
   return entry.filename.substring(entry.filename.lastIndexOf("/") + 1);
 }
 
-function addFile(filename, content, blob) {
+function addFile(filename, content) {
   zip.createWriter(new zip.BlobWriter(), function(writer) {
     // use a TextReader to read the String to add
     writer.add(filename, new zip.TextReader(content), function() {
@@ -71,21 +71,24 @@ function addFile(filename, content, blob) {
 
       // close the zip writer
       writer.close(function(blob) {
+        readFiles(blob);
       });
     });
-   }, handleInProgress, onerror(error));
+   }, handleInProgress, onerror);
 }
 
-function readFile(el, reader, i, length) {
+function readAndEditBlob(el, reader, i, length, editFunc) {
   let filename = getFilename(el);
   el.getData(new zip.TextWriter(), function(data) {
     console.log(data);
-    // addFile(filename, 'lool', data);
+    if (editFunc) {
+      editFunc(filename, 'lool');
+    }
     reader.close(handleClose(i + 1, length));
   }, handleInProgress);
 }
 
-function handleEntries(file) {
+function readAndEditFiles(file, editFunc) {
   zip.createReader(
     new zip.BlobReader(file), 
     function(reader) {
@@ -93,7 +96,7 @@ function handleEntries(file) {
         let length = entries.length
         if (length) {
           entries.forEach(function(el, i) {
-            readFile(el, reader, i, length);
+            readAndEditBlob(el, reader, i, length, editFunc);
           });
         }
       });
@@ -102,15 +105,14 @@ function handleEntries(file) {
   );
 }
 
-
-function handleFile(e) {
+function handleZip(e) {
   let file = e.target.files[0];
-  handleEntries(file);
+  readAndEditFiles(file, addFile);
 }
 
 window.onload = function() {
   zip.workerScriptsPath = '/lib/';
-  document.getElementById('file').addEventListener('change', handleFile, false);
+  document.getElementById('file').addEventListener('change', handleZip, false);
 }
 
 // function handleEntries(reader) {
