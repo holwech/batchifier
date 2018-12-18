@@ -43,20 +43,31 @@ function onerror(message) {
   console.error(message);
 }
 
-function handleEntry() {
-  console.log(text);
-  reader.close(function() { });
+
+function handleClose(current, total) {
+  console.log(fileCounter(current, total));
+  if (current == total) {
+    console.log('Done!');
+  }
 }
 
 function handleInProgress(current, total) {
-  // inprogress
+  // in progress current = num bytes, total = total bytes (I think)
+}
+
+function fileCounter(current, total) {
+  return `Processing file ${current}/${total}`;
 }
 
 function handleEntries(reader) {
   reader.getEntries(function(entries) {
-    if (entries.length) {
-      entries.forEach(function(el) {
-        el.getData(new zip.TextWriter(), handleEntry(text), handleInProgress(current, total))
+    let length = entries.length
+    if (length) {
+      entries.forEach(function(el, i) {
+        el.getData(new zip.TextWriter(), function(data) {
+          console.log(data);
+          reader.close(handleClose(i + 1, length));
+        }, handleInProgress)
       });
     }
   });
@@ -64,7 +75,7 @@ function handleEntries(reader) {
 
 function handleFile(e) {
   let file = e.target.files[0]
-  zip.createReader(new zip.BlobReader(blob), handleEntries(reader), onerror(error));
+  zip.createReader(new zip.BlobReader(file), handleEntries, onerror);
 }
 
 window.onload = function() {
