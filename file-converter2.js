@@ -11,22 +11,9 @@ function zipBlob(filename, blob, callback) {
 
 function unzipBlob(blob, callback) {
   // use a zip.BlobReader object to read zipped data stored into blob variable
-  zip.createReader(new zip.BlobReader(blob), function(zipReader) {
-    // get entries from the zip file
-    zipReader.getEntries(function(entries) {
-      // get data from the first file
-      entries[0].getData(new zip.BlobWriter("text/plain"), function(data) {
-        // close the reader and calls callback function with uncompressed data as parameter
-        zipReader.close();
-        callback(data);
-      });
-    });
-  }, onerror);
+y
 }
 
-function onerror(message) {
-  console.error(message);
-}
 // --------------------------------------
 // Check for the various File API support.
 if (window.File && window.FileReader && window.FileList && window.Blob) {
@@ -35,21 +22,49 @@ if (window.File && window.FileReader && window.FileList && window.Blob) {
   alert('The File APIs are not fully supported in this browser.');
 }
 
+// function handleFile(e) {
+//   let file = e.target.files[0]
+//   zipBlob("lorem.txt", file, function(zippedBlob) {
+//     // unzip the first file from zipped data stored in zippedBlob
+//     unzipBlob(zippedBlob, function(unzippedBlob) {
+//       // logs the uncompressed Blob
+
+//       let reader = new FileReader();
+//       reader.addEventListener('loadend', (e) => {
+//         const text = e.srcElement.result;
+//         console.log(text);
+//       });
+//       reader.readAsText(unzippedBlob);
+//     });
+//   });
+// }
+
+function onerror(message) {
+  console.error(message);
+}
+
+function handleEntry() {
+  console.log(text);
+  reader.close(function() { });
+}
+
+function handleInProgress(current, total) {
+  // inprogress
+}
+
+function handleEntries(reader) {
+  reader.getEntries(function(entries) {
+    if (entries.length) {
+      entries.forEach(function(el) {
+        el.getData(new zip.TextWriter(), handleEntry(text), handleInProgress(current, total))
+      });
+    }
+  });
+}
+
 function handleFile(e) {
   let file = e.target.files[0]
-  zipBlob("lorem.txt", file, function(zippedBlob) {
-    // unzip the first file from zipped data stored in zippedBlob
-    unzipBlob(zippedBlob, function(unzippedBlob) {
-      // logs the uncompressed Blob
-
-      let reader = new FileReader();
-      reader.addEventListener('loadend', (e) => {
-        const text = e.srcElement.result;
-        console.log(text);
-      });
-      reader.readAsText(unzippedBlob);
-    });
-  });
+  zip.createReader(new zip.BlobReader(blob), handleEntries(reader), onerror(error));
 }
 
 window.onload = function() {
