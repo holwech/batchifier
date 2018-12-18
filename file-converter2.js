@@ -1,43 +1,11 @@
-function zipBlob(filename, blob, callback) {
-  // use a zip.BlobWriter object to write zipped data into a Blob object
-  zip.createWriter(new zip.BlobWriter("application/zip"), function(zipWriter) {
-    // use a BlobReader object to read the data stored into blob variable
-    zipWriter.add(filename, new zip.BlobReader(blob), function() {
-      // close the writer and calls callback function
-      zipWriter.close(callback);
-    });
-  }, onerror);
-}
+const DEBUG = true;
 
-function unzipBlob(blob, callback) {
-  // use a zip.BlobReader object to read zipped data stored into blob variable
-y
-}
-
-// --------------------------------------
 // Check for the various File API support.
 if (window.File && window.FileReader && window.FileList && window.Blob) {
   // Great success! All the File APIs are supported.
 } else {
   alert('The File APIs are not fully supported in this browser.');
 }
-
-// function handleFile(e) {
-//   let file = e.target.files[0]
-//   zipBlob("lorem.txt", file, function(zippedBlob) {
-//     // unzip the first file from zipped data stored in zippedBlob
-//     unzipBlob(zippedBlob, function(unzippedBlob) {
-//       // logs the uncompressed Blob
-
-//       let reader = new FileReader();
-//       reader.addEventListener('loadend', (e) => {
-//         const text = e.srcElement.result;
-//         console.log(text);
-//       });
-//       reader.readAsText(unzippedBlob);
-//     });
-//   });
-// }
 
 function onerror(message) {
   console.error(message);
@@ -64,6 +32,9 @@ function getFilename(entry) {
 }
 
 function addFile(filename, content) {
+  if (DEBUG) {
+    console.log('New files contain:')
+  }
   zip.createWriter(new zip.BlobWriter(), function(writer) {
     // use a TextReader to read the String to add
     writer.add(filename, new zip.TextReader(content), function() {
@@ -71,24 +42,29 @@ function addFile(filename, content) {
 
       // close the zip writer
       writer.close(function(blob) {
-        readFiles(blob);
+        readAndEditFiles(blob, undefined, false);
       });
     });
    }, handleInProgress, onerror);
 }
 
-function readAndEditBlob(el, reader, i, length, editFunc) {
+function readAndEditBlob(el, reader, i, length, editFunc, showFileCounter = true) {
   let filename = getFilename(el);
   el.getData(new zip.TextWriter(), function(data) {
-    console.log(data);
+    if (DEBUG) {
+      console.log('File content of zip file is:')
+      console.log(data);
+    }
     if (editFunc) {
       editFunc(filename, 'lool');
     }
-    reader.close(handleClose(i + 1, length));
+    reader.close(function() {
+      if (showFileCounter) { handleClose(i + 1, length); }
+    });
   }, handleInProgress);
 }
 
-function readAndEditFiles(file, editFunc) {
+function readAndEditFiles(file, editFunc, showFileCounter = true) {
   zip.createReader(
     new zip.BlobReader(file), 
     function(reader) {
@@ -96,7 +72,7 @@ function readAndEditFiles(file, editFunc) {
         let length = entries.length
         if (length) {
           entries.forEach(function(el, i) {
-            readAndEditBlob(el, reader, i, length, editFunc);
+            readAndEditBlob(el, reader, i, length, editFunc, showFileCounter);
           });
         }
       });
