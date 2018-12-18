@@ -59,26 +59,72 @@ function fileCounter(current, total) {
   return `Processing file ${current}/${total}`;
 }
 
-function handleEntries(reader) {
-  reader.getEntries(function(entries) {
-    let length = entries.length
-    if (length) {
-      entries.forEach(function(el, i) {
-        el.getData(new zip.TextWriter(), function(data) {
-          console.log(data);
-          reader.close(handleClose(i + 1, length));
-        }, handleInProgress)
-      });
-    }
-  });
+function getFilename(entry) {
+  return entry.filename.substring(entry.filename.lastIndexOf("/") + 1);
 }
 
+function addFile(filename, content, blob) {
+  zip.createWriter(new zip.BlobWriter(), function(writer) {
+    // use a TextReader to read the String to add
+    writer.add(filename, new zip.TextReader(content), function() {
+      // onsuccess callback
+
+      // close the zip writer
+      writer.close(function(blob) {
+      });
+    });
+   }, handleInProgress, onerror(error));
+}
+
+function readFile(el, reader, i, length) {
+  let filename = getFilename(el);
+  el.getData(new zip.TextWriter(), function(data) {
+    console.log(data);
+    // addFile(filename, 'lool', data);
+    reader.close(handleClose(i + 1, length));
+  }, handleInProgress);
+}
+
+function handleEntries(file) {
+  zip.createReader(
+    new zip.BlobReader(file), 
+    function(reader) {
+      reader.getEntries(function(entries) {
+        let length = entries.length
+        if (length) {
+          entries.forEach(function(el, i) {
+            readFile(el, reader, i, length);
+          });
+        }
+      });
+    },
+    onerror
+  );
+}
+
+
 function handleFile(e) {
-  let file = e.target.files[0]
-  zip.createReader(new zip.BlobReader(file), handleEntries, onerror);
+  let file = e.target.files[0];
+  handleEntries(file);
 }
 
 window.onload = function() {
   zip.workerScriptsPath = '/lib/';
   document.getElementById('file').addEventListener('change', handleFile, false);
 }
+
+// function handleEntries(reader) {
+//   reader.getEntries(function(entries) {
+//     let length = entries.length
+//     if (length) {
+//       entries.forEach(function(el, i) {
+//         let filename = getFilename(el);
+//         el.getData(new zip.TextWriter(), function(data) {
+//           console.log(data);
+//           // addFile(filename, 'lool', data);
+//           reader.close(handleClose(i + 1, length));
+//         }, handleInProgress)
+//       });
+//     }
+//   });
+// }
