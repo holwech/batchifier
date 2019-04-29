@@ -1,0 +1,44 @@
+{
+  "name": "jszipediting",
+  "version": "0.0.1",
+  "description": "Examples of editing zip files using Javascript and the JSZip library and the zip.js library.",
+  "main": "lib/main.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "devDependencies": {
+    "prettier": "^1.16.4",
+    "ts-jest": "^24.0.2",
+    "ts-loader": "^5.3.3",
+    "tslint": "^5.15.0",
+    "tslint-config-prettier": "^1.18.0",
+    "typescript": "^3.4.2"
+  },
+  "scripts": {
+    "dev": "webpack-dev-server --mode development",
+    "build": "tsc",
+    "build:watch": "tsc -w",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
+    "lint": "tslint -p tsconfig.json",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm test && npm run lint",
+    "preversion": "npm run lint",
+    "version": "npm run format && git add -A",
+    "postversion": "git push && git push --tags"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/holwech/JSZipEditing.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/holwech/JSZipEditing/issues"
+  },
+  "homepage": "https://github.com/holwech/JSZipEditing#readme",
+  "dependencies": {
+    "jszip": "^3.2.1"
+  }
+}
