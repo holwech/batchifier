@@ -3,16 +3,16 @@
   "version": "0.0.1",
   "description": "Examples of editing zip files using Javascript and the JSZip library and the zip.js library.",
   "main": "lib/main.js",
-  "directories": {
-    "lib": "lib"
-  },
   "devDependencies": {
     "prettier": "^1.16.4",
     "ts-jest": "^24.0.2",
-    "ts-loader": "^5.3.3",
+    "ts-loader": "^5.4.4",
     "tslint": "^5.15.0",
     "tslint-config-prettier": "^1.18.0",
-    "typescript": "^3.4.2"
+    "typescript": "^3.4.2",
+    "webpack": "^4.30.0",
+    "webpack-cli": "^3.3.1",
+    "webpack-dev-server": "^3.3.1"
   },
   "scripts": {
     "dev": "webpack-dev-server --mode development",
@@ -39,6 +39,7 @@
   },
   "homepage": "https://github.com/holwech/JSZipEditing#readme",
   "dependencies": {
+    "@types/jszip": "^3.1.5",
     "jszip": "^3.2.1"
   }
 }
