@@ -40,6 +40,7 @@
   "homepage": "https://github.com/holwech/JSZipEditing#readme",
   "dependencies": {
     "@types/jszip": "^3.1.5",
-    "jszip": "^3.2.1"
+    "jszip": "^3.2.1",
+    "piexifjs": "^2.0.0-beta.7"
   }
 }

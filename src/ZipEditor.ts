@@ -1,5 +1,6 @@
 // const JSZip = require('jszip');
 import JSZip, { JSZipObject, OutputType } from 'jszip';
+import * as piexif from 'pie';
 
 interface HTMLInputEvent extends Event {
   target: HTMLInputElement & EventTarget;
@@ -20,9 +21,13 @@ export default class ZipEditor {
     const zipFile = (event as HTMLInputEvent).target.files![0]
     const reader = new FileReader();
     const decoded = await this.zip.loadAsync(zipFile);
-    const fileList = decoded.forEach(async (relativePath, zipEntry) => {
-      console.log(await this.decodeEntry(relativePath, zipEntry, 'text'))
+    const fileList: File[] = [];
+    decoded.forEach(async (relativePath, zipEntry) => {
+      fileList.push(await this.decodeEntry(relativePath, zipEntry, 'text'));
     });
+    var exif = {};
+    exif[piexif.ExifIFD.DateTimeOriginal] = "2010:10:10 10:10:10";
+    console.log(fileList);
       // zip.loadAsync(file)
       // .then(function(zipFolder) {
       //     return zipFolder.forEach((relativePath, zipEntry) => {
@@ -37,7 +42,7 @@ export default class ZipEditor {
       //     console.log('foreach done')
       // });
   }
-
+  
   public async decodeEntry(relativePath: string, zipEntry: JSZipObject, outputType: OutputType): Promise<File> {
     const content = await zipEntry.async(outputType);
     return {
