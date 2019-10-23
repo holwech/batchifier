@@ -1,6 +1,7 @@
 // const JSZip = require('jszip');
 import JSZip, { JSZipObject, OutputType } from 'jszip';
-import * as piexif from 'pie';
+import { IExif, TagValues, IExifElement, dump, load, insert } from 'piexif-ts';
+import fileSaver from 'file-saver';
 
 interface HTMLInputEvent extends Event {
   target: HTMLInputElement & EventTarget;
@@ -17,30 +18,39 @@ export default class ZipEditor {
   private zip = new JSZip();
 
   public async openFile(event: Event): Promise<void> {
-    console.log(this.zip)
     const zipFile = (event as HTMLInputEvent).target.files![0]
     const reader = new FileReader();
     const decoded = await this.zip.loadAsync(zipFile);
-    const fileList: File[] = [];
-    decoded.forEach(async (relativePath, zipEntry) => {
-      fileList.push(await this.decodeEntry(relativePath, zipEntry, 'text'));
+    const re = /(.jpg|.png|.gif|.ps|.jpeg)$/;
+    const files: File[] = [];
+    decoded.forEach(async (relativePath: string, entry: JSZipObject) => {
+      if (re.test(entry.name)) {
+        console.log(entry.name)
+        files.push(await this.processFile(relativePath, entry));
+      }
     });
-    var exif = {};
-    exif[piexif.ExifIFD.DateTimeOriginal] = "2010:10:10 10:10:10";
-    console.log(fileList);
-      // zip.loadAsync(file)
-      // .then(function(zipFolder) {
-      //     return zipFolder.forEach((relativePath, zipEntry) => {
-      //         console.log(zipEntry.name);
-      //         zipEntry.async('string').then((text) => {
-      //             let newContent = text + ' YO!';
-      //             zip.file(zipEntry.name, newContent);
-      //         });
-      //     });
-      //     // zip_folder.file("test 1.txt").async("binary").then((text) => console.log(text)); // a promise of "Hello World\n"
-      // }).then(() => {
-      //     console.log('foreach done')
-      // });
+    
+    for (const file of files) {
+      this.zip.folder('modified').file(file.name, file.content, {binary: true});
+    }
+    const blob = await this.zip.generateAsync({ type: 'blob' });
+    //fileSaver.saveAs(blob, 'generated.zip');
+  }
+
+  public async processFile(relativePath: string, zipEntry: JSZipObject): Promise<File> {
+    const file = await this.decodeEntry(relativePath, zipEntry, 'binarystring');
+    const exif = load(file.content);
+    console.log(exif);
+    if (exif.Exif) {
+      exif.Exif[TagValues.ExifIFD.DateTimeOriginal] = '2010:10:10 10:10:10';
+    } else {
+      exif.Exif = {
+        [TagValues.ExifIFD.DateTimeOriginal]: '2010:10:10 10:10:10',
+      } 
+    }
+    const exifBytes = dump(exif);
+    insert(exifBytes, file.content);
+    return file;
   }
   
   public async decodeEntry(relativePath: string, zipEntry: JSZipObject, outputType: OutputType): Promise<File> {
