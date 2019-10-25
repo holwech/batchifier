@@ -15,46 +15,29 @@ interface File {
 }
 
 export default class ZipEditor {
-
-  // public async openFileTest(event: Event): Promise<void> {
-  //   const zipFile = (event as HTMLInputEvent).target.files![0]
-  //   const file = await this.loadFile(zipFile);
-  //   console.log(zipFile.name);
-  //   console.log(file);
-  //   const exif = load(file as string);
-  //   console.log(exif);
-  //   //const decoded = await this.zip.loadAsync(zipFile);
-  // }
-
   public async openFile(event: Event): Promise<void> {
-
     const zip = new JSZip();
     const zipFile = (event as HTMLInputEvent).target.files![0]
     const decoded = await zip.loadAsync(zipFile);
-    const re = /(.jpg|.png|.gif|.ps|.jpeg)$/;
-    //  decoded.forEach(async (relativePath: string, entry: JSZipObject) => {
-    //   console.log(await this.decodeEntry(relativePath, entry, 'text'));
-    //  });
-    
-    const promises = Array<Promise<void>>();
+
     const newZip = new JSZip();
-    decoded.forEach((relativePath: string, entry: JSZipObject) => {
-      if (re.test(entry.name)) {
-        console.log(entry.date);
-        
-        promises.push(this.processFile(relativePath, entry, newZip));
-      }
+    const settings = this.setup();
+
+    const promises = Array<Promise<void>>();
+    decoded.forEach(async (relativePath: string, file: JSZipObject) => {
+      const content = await file.async('binarystring');
+      promises.push(this.processFile(relativePath, file, content, newZip, settings));
     });
     await Promise.all(promises);
     const blob = await newZip.generateAsync({ type: 'blob' });
     fileSaver.saveAs(blob, 'generated.zip');
   }
 
-  public async processFile(relativePath: string, zipEntry: JSZipObject, newZip: JSZip): Promise<void> {
-    
-    const file = await this.decodeEntry(relativePath, zipEntry, 'binarystring');
-    const exif = load(file.content);
-    
+  public async processFile(relativePath: string, entry: JSZipObject, content: string, newZip: JSZip, settings: any): Promise<void> {
+    if (settings.re.test(entry.name)) {
+      return;
+    }
+    const exif = load(content);
     if (exif.Exif) {
       exif.Exif[TagValues.ExifIFD.DateTimeOriginal] = '2010:10:10 10:10:10';
     } else {
@@ -63,9 +46,9 @@ export default class ZipEditor {
       }
     }
     const exifBytes = dump(exif);
-    file.content = insert(exifBytes, file.content);
-    const name = file.name.split('.');
-    newZip.file(name[0] + '_modified.' + name[1], file.content, { binary: true });
+    content = insert(exifBytes, content);
+    const name = entry.name.split('.');
+    newZip.file(name[0] + '_modified.' + name[1], content, { binary: true });
   }
 
   public async decodeEntry(relativePath: string, zipEntry: JSZipObject, outputType: OutputType): Promise<File> {
@@ -75,6 +58,12 @@ export default class ZipEditor {
       relativePath,
       content,
       outputType
+    }
+  }
+
+  private setup(): {[key: string]: any } {
+    return {
+      re: /(.jpg|.png|.gif|.ps|.jpeg)$/,
     }
   }
 
