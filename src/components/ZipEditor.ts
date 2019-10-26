@@ -8,16 +8,16 @@ interface HTMLInputEvent extends Event {
 }
 
 interface File {
-  name: string,
-  relativePath: string,
-  content: any,
-  outputType: OutputType,
+  name: string;
+  relativePath: string;
+  content: any;
+  outputType: OutputType;
 }
 
 export default class ZipEditor {
   public async openFile(event: Event): Promise<void> {
     const zip = new JSZip();
-    const zipFile = (event as HTMLInputEvent).target.files![0]
+    const zipFile = (event as HTMLInputEvent).target.files![0];
     const decoded = await zip.loadAsync(zipFile);
 
     const newZip = new JSZip();
@@ -33,7 +33,13 @@ export default class ZipEditor {
     fileSaver.saveAs(blob, 'generated.zip');
   }
 
-  public async processFile(relativePath: string, entry: JSZipObject, content: string, newZip: JSZip, settings: any): Promise<void> {
+  public async processFile(
+    relativePath: string,
+    entry: JSZipObject,
+    content: string,
+    newZip: JSZip,
+    settings: any,
+  ): Promise<void> {
     if (settings.re.test(entry.name)) {
       return;
     }
@@ -43,7 +49,7 @@ export default class ZipEditor {
     } else {
       exif.Exif = {
         [TagValues.ExifIFD.DateTimeOriginal]: '2010:10:10 10:10:10',
-      }
+      };
     }
     const exifBytes = dump(exif);
     content = insert(exifBytes, content);
@@ -57,14 +63,14 @@ export default class ZipEditor {
       name: zipEntry.name,
       relativePath,
       content,
-      outputType
-    }
+      outputType,
+    };
   }
 
-  private setup(): {[key: string]: any } {
+  private setup(): { [key: string]: any } {
     return {
       re: /(.jpg|.png|.gif|.ps|.jpeg)$/,
-    }
+    };
   }
 
   private loadFile(file: File): Promise<string | null> {
@@ -75,7 +81,7 @@ export default class ZipEditor {
         const decoder = new TextDecoder('utf-8');
         resolve(decoder.decode(reader.result as ArrayBuffer));
       };
-      reader.readAsArrayBuffer(file as any as Blob);
+      reader.readAsArrayBuffer((file as any) as Blob);
     });
   }
 }
