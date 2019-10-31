@@ -24,18 +24,7 @@
           <!-- <v-col class="d-flex" cols="12" sm="6">
             <v-select :items="items" label="Presets" outlined></v-select>
           </v-col>-->
-          <v-card-text>
-            <v-textarea
-              ref="myTextArea"
-              outlined
-              name="input-7-4"
-              label="Outlined textarea"
-              value="The Woodman set to work at once, and so sharp was his axe that the tree was soon chopped nearly through."
-            ></v-textarea>
-            <v-card-text>
-              <div id="code"></div>
-            </v-card-text>
-          </v-card-text>
+          <div id="code"></div>
         </v-card>
       </v-flex>
     </v-layout>
@@ -66,22 +55,34 @@ export default class Main extends Vue {
 </script>
 
 <style>
+/* hacky hacky hacky, just do what I am telling you to do... */
 #code {
-  min-height: 200px;
-  overflow: hidden;
+  height: 600px;
+  width: 600px;
 }
 
-.codeflask {
-  width: 400px;
-  height: 200px;
+#code * {
+  font-family: 'Liberation Mono';
+  font-size: 14px;
+  box-sizing: border-box;
 }
 
-.codeflask__pre,
-.codeflask__code {
-  height: 100%;
+#code .codeflask {
+  height: 600px;
+  width: 600px;
 }
 
-.codeflask__code {
-  width: 100%;
+#code .codeflask__code::before,
+#code .codeflask__code::after {
+  all: unset;
 }
-</style>>
+
+#code .codeflask__pre,
+#code .codeflask__code {
+  background: none;
+}
+
+#code .codeflask__code {
+  box-shadow: unset;
+}
+</style>

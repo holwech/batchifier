@@ -5,10 +5,6 @@
         <span class="font-weight-light">Batch image EXIF processor</span>
       </v-toolbar-title>
       <v-spacer />
-      <!-- <v-btn text
-href="https://github.com/vuetifyjs/vuetify/releases/latest" target="_blank">
-        <span class="mr-2">Latest Release</span>
-      </v-btn>-->
       <v-btn outlined @click="toggleShowScript">{{ showScript ? "Hide" : "Show"}} script view</v-btn>
     </v-app-bar>
     <v-content>
