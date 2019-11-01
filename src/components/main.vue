@@ -46,6 +46,18 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import CodeFlask from 'codeflask';
+import JSZip, { JSZipObject } from 'jszip';
+
+interface Code {
+  settings: any;
+  process: (
+    relativePath: string,
+    entry: JSZipObject,
+    content: string,
+    newZip: JSZip,
+    settings: any,
+  ) => Promise<void>;
+}
 
 @Component({
   props: {
@@ -60,7 +72,12 @@ export default class Main extends Vue {
 
   private mounted() {
     this.flask = new CodeFlask('#code', { language: 'js', lineNumbers: true });
-    this.flask.updateCode('function() {}');
+    this.flask.onUpdate((el: string) => this.runCode(el));
+  }
+
+  private runCode(code: string) {
+    const evaluated = (Function(`return (${code});`)() as Code);
+    evaluated.settings();
   }
 }
 </script>
