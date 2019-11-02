@@ -7,39 +7,57 @@ interface HTMLInputEvent extends Event {
   target: HTMLInputElement & EventTarget;
 }
 
-interface File {
+interface FileContent {
   name: string;
   relativePath: string;
   content: any;
   outputType: OutputType;
 }
 
-export default class ZipEditor {
-  public async openFile(event: Event): Promise<void> {
-    const zip = new JSZip();
-    const zipFile = (event as HTMLInputEvent).target.files![0];
-    const decoded = await zip.loadAsync(zipFile);
-
-    const newZip = new JSZip();
-    const settings = this.setup();
-
-    const promises = Array<Promise<void>>();
-    decoded.forEach(async (relativePath: string, file: JSZipObject) => {
-      const content = await file.async('binarystring');
-      promises.push(this.processFile(relativePath, file, content, newZip, settings));
-    });
-    await Promise.all(promises);
-    const blob = await newZip.generateAsync({ type: 'blob' });
-    fileSaver.saveAs(blob, 'generated.zip');
-  }
-
-  public async processFile(
+export interface Code {
+  settings: any;
+  process: (
     relativePath: string,
     entry: JSZipObject,
     content: string,
     newZip: JSZip,
     settings: any,
-  ): Promise<void> {
+  ) => Promise<void>;
+}
+
+export interface Payload {
+  code: Code;
+  progress: {
+    total: number;
+    count: number;
+  }
+}
+
+export default class ZipEditor {
+  public async openFile(file: File, payload: Payload): Promise<void> {
+    const zip = new JSZip();
+    const decoded = await zip.loadAsync(file);
+
+    const newZip = new JSZip();
+    let count = 0;
+    decoded.forEach(async () => count++);
+    payload.progress.total = count;
+    decoded.forEach(async (relativePath: string, file: JSZipObject): Promise<void> => {
+      const content = await file.async('binarystring');
+      payload.code.process(relativePath, file, content, newZip, payload.code.settings);
+      payload.progress.count++;
+    });
+    const blob = await newZip.generateAsync({ type: 'blob' });
+    fileSaver.saveAs(blob, 'generated.zip');
+  }
+
+  public processFile(
+    relativePath: string,
+    entry: JSZipObject,
+    content: string,
+    newZip: JSZip,
+    settings: any,
+  ): void {
     if (settings.re.test(entry.name)) {
       return;
     }
@@ -57,7 +75,7 @@ export default class ZipEditor {
     newZip.file(name[0] + '_modified.' + name[1], content, { binary: true });
   }
 
-  public async decodeEntry(relativePath: string, zipEntry: JSZipObject, outputType: OutputType): Promise<File> {
+  public async decodeEntry(relativePath: string, zipEntry: JSZipObject, outputType: OutputType): Promise<FileContent> {
     const content = await zipEntry.async(outputType);
     return {
       name: zipEntry.name,

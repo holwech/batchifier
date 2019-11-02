@@ -25,7 +25,7 @@ import Component from 'vue-class-component';
   },
 })
 export default class App extends Vue {
-  private showScript = true;
+  private showScript = false;
 
   private toggleShowScript() {
     this.showScript = !this.showScript;

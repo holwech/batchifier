@@ -5,13 +5,13 @@
         <v-card class="pa-5 mt-5">
           <v-card-title>Open ZIP-file</v-card-title>
           <v-card-text>
-            <v-file-input label="File input" outlined dense></v-file-input>
-            <v-progress-linear v-model="progress" height="25" color="blue-grey" reactive>
-              <strong>{{ Math.ceil(progress) }}%</strong>
+            <v-file-input outlined dense label="File input" accept=".zip" @change="openFile"></v-file-input>
+            <v-progress-linear v-model="getProgress" height="25" color="blue-grey" reactive>
+              <strong>{{ getProgress }}%</strong>
             </v-progress-linear>
           </v-card-text>
           <v-card-actions>
-            <v-btn>Process</v-btn>
+            <v-btn :disabled="!appState.fileAdded" @click="process">{{ processBtnText }}</v-btn>
           </v-card-actions>
         </v-card>
       </v-flex>
@@ -24,6 +24,10 @@
           <!-- <v-col class="d-flex" cols="12" sm="6">
             <v-select :items="items" label="Presets" outlined></v-select>
           </v-col>-->
+          <v-btn
+            :class="{ error: appState.invalidCode, success: !appState.invalidCode }"
+            class="mb-2"
+          >{{ appState.invalidCode ? 'Invalid' : 'Valid' }}</v-btn>
           <div id="code"></div>
         </v-card>
       </v-flex>
@@ -35,18 +39,9 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import CodeFlask from 'codeflask';
-import JSZip, { JSZipObject } from 'jszip';
-
-interface Code {
-  settings: any;
-  process: (
-    relativePath: string,
-    entry: JSZipObject,
-    content: string,
-    newZip: JSZip,
-    settings: any,
-  ) => Promise<void>;
-}
+import ZipEditor, { Payload, Code } from './ZipEditor';
+import { whatsappFix } from './presetCode';
+import { Watch } from 'vue-property-decorator';
 
 @Component({
   props: {
@@ -54,19 +49,63 @@ interface Code {
   },
 })
 export default class Main extends Vue {
-  private progress = 20;
   private processStarted = false;
-  // eslint-disable-next-line
   private flask?: CodeFlask;
+  private zipEditor: ZipEditor = new ZipEditor();
+  private file?: File;
+  private processBtnText = 'Process';
+  private appState = {
+    invalidCode: false,
+    fileAdded: false,
+  };
+  private progress = {
+    total: 0,
+    count: 0,
+  };
 
-  private mounted() {
-    this.flask = new CodeFlask('#code', { language: 'js', lineNumbers: true });
-    this.flask.onUpdate((el: string) => this.runCode(el));
+  @Watch('showScript')
+  private openScriptWindow(oldOld: boolean, newVal: boolean) {
+    console.log('test');
+    // this.flask = new CodeFlask('#code', { language: 'js', lineNumbers: true });
+    // this.flask.updateCode(whatsappFix);
+    // this.flask.onUpdate(() => this.evaluateCode());
   }
 
-  private runCode(code: string) {
-    const evaluated = (Function(`return (${code});`)() as Code);
-    evaluated.settings();
+  private process() {
+    const code = this.evaluateCode();
+    if (code) {
+      const payload: Payload = {
+        code,
+        progress: this.progress,
+      };
+      this.zipEditor.openFile(this.file!, payload);
+    }
+  }
+
+  private evaluateCode(): Code | undefined {
+    try {
+      this.appState.invalidCode = false;
+      return Function(`return (${this.flask!.getCode()});`)() as Code;
+    } catch (error) {
+      this.appState.invalidCode = true;
+      this.appState.fileAdded = false;
+      console.log(error);
+      return;
+    }
+  }
+
+  private openFile(event: File) {
+    this.file = event;
+    this.appState.fileAdded = true;
+    this.evaluateCode();
+  }
+
+  get getProgress() {
+    if (this.progress.total == 0) {
+      return 0;
+    } else {
+      return Math.ceil((this.progress.count / this.progress.total) * 100);
+    }
   }
 }
 </script>
