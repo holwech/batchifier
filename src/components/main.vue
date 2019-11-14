@@ -6,7 +6,12 @@
           <v-card-title>Open ZIP-file</v-card-title>
           <v-card-text>
             <v-file-input outlined dense label="File input" accept=".zip" @change="openFile"></v-file-input>
-            <v-progress-linear v-model="getProgress" height="25" color="blue-grey" reactive>
+            <v-progress-linear
+              v-model="getProgress"
+              height="25"
+              :color="getProgress == 100 ? 'green' : 'blue-grey'"
+              reactive
+            >
               <strong>{{ getProgress }}%</strong>
             </v-progress-linear>
           </v-card-text>
@@ -15,20 +20,32 @@
           </v-card-actions>
         </v-card>
       </v-flex>
-      <v-flex v-if="showScript" md6>
+      <v-flex :class="{ hide: !showScript }" md6>
         <v-card class="pa-5 mt-5">
           <v-card-title>Run custom scripts</v-card-title>
           <v-card-text
             style="color: red;"
           >WARNING - Running custom scripts in your browser can be DANGEROUS. Do not copy paste and run scripts if you do not know what they are doing and/or are from a source you do not trust. I do not take any responsbility for damage or harm caused by using this tool.</v-card-text>
-          <!-- <v-col class="d-flex" cols="12" sm="6">
-            <v-select :items="items" label="Presets" outlined></v-select>
-          </v-col>-->
-          <v-btn
-            :class="{ error: appState.invalidCode, success: !appState.invalidCode }"
-            class="mb-2"
-          >{{ appState.invalidCode ? 'Invalid' : 'Valid' }}</v-btn>
-          <div id="code"></div>
+          <v-row>
+            <v-col md-9>
+              <v-select
+                v-model="selectedPreset"
+                :items="presetCode"
+                outlined
+                @change="setPresetCode"
+              ></v-select>
+            </v-col>
+            <v-col md-3>
+              <v-btn
+                :class="{ error: appState.invalidCode, success: !appState.invalidCode }"
+                class="mb-2"
+                text
+              >{{ appState.invalidCode ? 'Invalid' : 'Valid' }}</v-btn>
+            </v-col>
+          </v-row>
+          <v-row>
+            <div id="code"></div>
+          </v-row>
         </v-card>
       </v-flex>
     </v-layout>
@@ -40,8 +57,7 @@ import Vue from 'vue';
 import Component from 'vue-class-component';
 import CodeFlask from 'codeflask';
 import ZipEditor, { Payload, Code } from './ZipEditor';
-import { whatsappFix } from './presetCode';
-import { Watch } from 'vue-property-decorator';
+import { presetCode } from './presetCode';
 
 @Component({
   props: {
@@ -57,35 +73,45 @@ export default class Main extends Vue {
   private appState = {
     invalidCode: false,
     fileAdded: false,
+    showScriptWindow: false,
   };
   private progress = {
     total: 0,
     count: 0,
   };
+  private presetCode = presetCode.map(element => element.text);
+  private selectedPreset = presetCode[0].text;
 
-  @Watch('showScript')
-  private openScriptWindow(oldOld: boolean, newVal: boolean) {
-    console.log('test');
-    // this.flask = new CodeFlask('#code', { language: 'js', lineNumbers: true });
-    // this.flask.updateCode(whatsappFix);
-    // this.flask.onUpdate(() => this.evaluateCode());
+  private mounted() {
+    this.flask = new CodeFlask('#code', { language: 'js', lineNumbers: true });
+    this.flask.updateCode(presetCode[0].value);
+    this.flask.onUpdate(() => this.evaluateCode());
+  }
+
+  private setPresetCode(selected: string) {
+    console.log(selected);
+    var code = presetCode.find(el => el.text === selected);
+    if (code) {
+      this.flask!.updateCode(code.value);
+    }
   }
 
   private process() {
-    const code = this.evaluateCode();
-    if (code) {
-      const payload: Payload = {
-        code,
-        progress: this.progress,
-      };
-      this.zipEditor.openFile(this.file!, payload);
-    }
+    this.progress = {
+      total: 0,
+      count: 0,
+    };
+    const payload: Payload = {
+      code: this.flask!.getCode(),
+      progress: this.progress,
+    };
+    this.zipEditor.openFile(this.file!, payload);
   }
 
   private evaluateCode(): Code | undefined {
     try {
       this.appState.invalidCode = false;
-      return Function(`return (${this.flask!.getCode()});`)() as Code;
+      return Function(`"use strict";return (${this.flask!.getCode()});`)() as Code;
     } catch (error) {
       this.appState.invalidCode = true;
       this.appState.fileAdded = false;
@@ -117,6 +143,10 @@ export default class Main extends Vue {
   width: 600px;
 }
 
+.hide {
+  display: none;
+}
+
 #code * {
   font-family: 'Liberation Mono';
   font-size: 14px;
@@ -125,7 +155,7 @@ export default class Main extends Vue {
 
 #code .codeflask {
   height: 600px;
-  width: 600px;
+  width: 800px;
 }
 
 #code .codeflask__code::before,

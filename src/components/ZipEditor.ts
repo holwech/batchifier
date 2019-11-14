@@ -26,7 +26,7 @@ export interface Code {
 }
 
 export interface Payload {
-  code: Code;
+  code: string;
   progress: {
     total: number;
     count: number;
@@ -37,18 +37,33 @@ export default class ZipEditor {
   public async openFile(file: File, payload: Payload): Promise<void> {
     const zip = new JSZip();
     const decoded = await zip.loadAsync(file);
+    const code = this.evaluateCode(payload.code);
 
     const newZip = new JSZip();
     let count = 0;
     decoded.forEach(async () => count++);
     payload.progress.total = count;
-    decoded.forEach(async (relativePath: string, file: JSZipObject): Promise<void> => {
-      const content = await file.async('binarystring');
-      payload.code.process(relativePath, file, content, newZip, payload.code.settings);
-      payload.progress.count++;
+
+    const promises = Array<Promise<void>>();
+    decoded.forEach((relativePath: string, file: JSZipObject): void => {
+      promises.push(new Promise(async (resolve) => {
+        var content = await file.async('binarystring');
+        code.process(relativePath, file, content, newZip, code.settings);
+        payload.progress.count++;
+        resolve();
+      }));
     });
+    await Promise.all(promises);
     const blob = await newZip.generateAsync({ type: 'blob' });
     fileSaver.saveAs(blob, 'generated.zip');
+  }
+
+  private evaluateCode(code: string): Code {
+    return Function(
+      'load', 'dump', 'insert', 'TagValues',
+      ` "use strict";
+      return (${code});
+    `)(load, dump, insert, TagValues) as Code;
   }
 
   public processFile(
@@ -58,7 +73,7 @@ export default class ZipEditor {
     newZip: JSZip,
     settings: any,
   ): void {
-    if (settings.re.test(entry.name)) {
+    if (!settings.re.test(entry.name)) {
       return;
     }
     const exif = load(content);

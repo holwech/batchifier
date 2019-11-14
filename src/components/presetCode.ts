@@ -1,10 +1,13 @@
-export const whatsappFix = `
+export const presetCode = [
+  {
+    text: 'Example',
+    value: `
 {
   settings: {
     re: /(.jpg|.png|.gif|.ps|.jpeg)$/,
   },
   process: (relativePath, entry, content, newZip, settings) => {
-    if (settings.re.test(entry.name)) {
+    if (!settings.re.test(entry.name)) {
       return;
     }
     const exif = load(content);
@@ -22,3 +25,11 @@ export const whatsappFix = `
   }
 }
 `
+  },
+  {
+    text: 'WhatsApp backup fixer',
+    value: `
+    lol
+`
+  }
+]
