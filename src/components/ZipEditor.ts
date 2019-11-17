@@ -1,7 +1,6 @@
 // const JSZip = require('jszip');
 import JSZip, { JSZipObject, OutputType } from 'jszip';
 import { dump, load, insert, TagValues } from 'piexif-ts';
-import fileSaver from 'file-saver';
 
 interface HTMLInputEvent extends Event {
   target: HTMLInputElement & EventTarget;
@@ -34,7 +33,7 @@ export interface Payload {
 }
 
 export default class ZipEditor {
-  public async openFile(file: File, payload: Payload): Promise<void> {
+  public async openFile(file: File, payload: Payload): Promise<Blob> {
     const zip = new JSZip();
     const decoded = await zip.loadAsync(file);
     const code = this.evaluateCode(payload.code);
@@ -55,7 +54,7 @@ export default class ZipEditor {
     });
     await Promise.all(promises);
     const blob = await newZip.generateAsync({ type: 'blob' });
-    fileSaver.saveAs(blob, 'generated.zip');
+    return blob;
   }
 
   private evaluateCode(code: string): Code {

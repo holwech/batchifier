@@ -4,9 +4,21 @@
       <v-flex md6>
         <v-card class="pa-5 mt-5">
           <v-card-title>Open ZIP-file</v-card-title>
-          <v-card-text>
+          <v-card-subtitle>Create your own scripts by clicking "Show script view" in the top right corner or select one of the preset script from below.</v-card-subtitle>
+          <v-flex>
+            <v-select
+              v-model="selectedPreset"
+              :items="presetCode"
+              outlined
+              label="Presets"
+              @change="setPresetCode"
+            ></v-select>
+          </v-flex>
+          <v-divider></v-divider>
+          <v-card-text class="pt-5">
             <v-file-input outlined dense label="File input" accept=".zip" @change="openFile"></v-file-input>
             <v-progress-linear
+              v-if="progress.started"
               v-model="getProgress"
               height="25"
               :color="getProgress == 100 ? 'green' : 'blue-grey'"
@@ -17,6 +29,7 @@
           </v-card-text>
           <v-card-actions>
             <v-btn :disabled="!appState.fileAdded" @click="process">{{ processBtnText }}</v-btn>
+            <v-btn v-if="progress.done" class="success" @click="download">Download</v-btn>
           </v-card-actions>
         </v-card>
       </v-flex>
@@ -26,12 +39,18 @@
           <v-card-text
             style="color: red;"
           >WARNING - Running custom scripts in your browser can be DANGEROUS. Do not copy paste and run scripts if you do not know what they are doing and/or are from a source you do not trust. I do not take any responsbility for damage or harm caused by using this tool.</v-card-text>
-          <v-row>
+          <v-row class="pb-5">
+            <v-col md-12>
+              <Reference></Reference>
+            </v-col>
+          </v-row>
+          <v-row class="pt-5">
             <v-col md-9>
               <v-select
                 v-model="selectedPreset"
                 :items="presetCode"
                 outlined
+                label="Presets"
                 @change="setPresetCode"
               ></v-select>
             </v-col>
@@ -58,10 +77,15 @@ import Component from 'vue-class-component';
 import CodeFlask from 'codeflask';
 import ZipEditor, { Payload, Code } from './ZipEditor';
 import { presetCode } from './presetCode';
+import fileSaver from 'file-saver';
+import Reference from './Reference.vue';
 
 @Component({
   props: {
     showScript: Boolean,
+  },
+  components: {
+    Reference,
   },
 })
 export default class Main extends Vue {
@@ -78,7 +102,10 @@ export default class Main extends Vue {
   private progress = {
     total: 0,
     count: 0,
+    done: false,
+    started: false,
   };
+  private blob?: Blob;
   private presetCode = presetCode.map(element => element.text);
   private selectedPreset = presetCode[0].text;
 
@@ -100,12 +127,25 @@ export default class Main extends Vue {
     this.progress = {
       total: 0,
       count: 0,
+      done: false,
+      started: true,
     };
     const payload: Payload = {
       code: this.flask!.getCode(),
       progress: this.progress,
     };
-    this.zipEditor.openFile(this.file!, payload);
+    this.zipEditor.openFile(this.file!, payload).then(blob => {
+      this.blob = blob;
+      this.progress.done = true;
+    });
+  }
+
+  private download() {
+    if (this.blob) {
+      fileSaver.saveAs(this.blob, 'generated.zip');
+    } else {
+      throw new Error('Blob not defined');
+    }
   }
 
   private evaluateCode(): Code | undefined {
@@ -124,6 +164,12 @@ export default class Main extends Vue {
     this.file = event;
     this.appState.fileAdded = true;
     this.evaluateCode();
+    this.progress = {
+      total: 0,
+      count: 0,
+      done: false,
+      started: false,
+    };
   }
 
   get getProgress() {
@@ -137,7 +183,7 @@ export default class Main extends Vue {
 </script>
 
 <style>
-/* hacky hacky hacky, just do what I am telling you to do... */
+/* just do what I am telling you to do... */
 #code {
   height: 600px;
   width: 600px;
@@ -170,5 +216,9 @@ export default class Main extends Vue {
 
 #code .codeflask__code {
   box-shadow: unset;
+}
+
+.v-expansion-panel:before {
+  box-shadow: none !important;
 }
 </style>
