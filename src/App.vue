@@ -4,6 +4,9 @@
       <v-toolbar-title class="headline text-uppercase">
         <span class="font-weight-light">BATCHIFIER</span>
       </v-toolbar-title>
+      <div
+        class="subheading pl-5 font-weight-light"
+      >batch edit image EXIF data purely in the browser</div>
       <v-spacer />
       <v-btn outlined @click="toggleShowScript">{{ showScript ? "Hide" : "Show"}} script view</v-btn>
     </v-app-bar>
