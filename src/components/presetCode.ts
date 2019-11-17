@@ -1,6 +1,6 @@
 export const presetCode = [
   {
-    text: 'Fix WhatsApp image backup',
+    text: 'WhatsApp image backup fix',
     value: `{
   settings: {
     re: /(.jpg|.png|.gif|.jpeg)$/,
@@ -28,8 +28,40 @@ export const presetCode = [
     }
     const exifBytes = dump(exif);
     content = insert(exifBytes, content);
-    const name = entry.name.split('.');
-    newZip.file(name[0] + '.' + name[1], content, { binary: true });
+    newZip.file(entry.name, content, { binary: true });
+  }
+}
+`
+  },
+  {
+    text: 'Strip all EXIF',
+    value: `{
+  settings: {
+    re: /(.jpg|.png|.gif|.jpeg)$/,
+  },
+  process: (relativePath, entry, content, newZip, settings) => {
+    if (!settings.re.test(entry.name)) {
+      return;
+    }
+    const exifBytes = dump({});
+    content = insert(exifBytes, content);
+    newZip.file(entry.name, content, { binary: true });
+  }
+}
+`
+  },
+  {
+    text: 'Strip date taken EXIF',
+    value: `{
+  settings: {},
+  process: (relativePath, entry, content, newZip, settings) => {
+    const exif = load(content);
+    if (exif.Exif && exif.Exif[TagValues.ExifIFD.DateTimeOriginal]) {
+      delete exif.Exif[TagValues.ExifIFD.DateTimeOriginal];
+    }
+    const exifBytes = dump(exif);
+    content = insert(exifBytes, content);
+    newZip.file(entry.name, content, { binary: true });
   }
 }
 `
