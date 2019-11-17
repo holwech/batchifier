@@ -1,2 +1,3 @@
-# JSZip Editing
-Examples of editing zip files using Javascript and the JSZip library and the zip.js library.
+# Batch edit EXIF data purely in the browser
+
+View it on [batchifier.com][https://batchifier.com]
