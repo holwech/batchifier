@@ -75,8 +75,8 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import CodeFlask from 'codeflask';
-import ZipEditor, { Payload, Code } from './ZipEditor';
-import { presetCode } from './presetCode';
+import ZipEditor, { Payload, Code } from '../utils/ZipEditor';
+import { presetCode } from '../utils/presetCode';
 import fileSaver from 'file-saver';
 import Reference from './Reference.vue';
 
