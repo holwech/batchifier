@@ -6,7 +6,7 @@
         <v-expansion-panels>
           <v-expansion-panel>
             <v-expansion-panel-header>
-              <pre>Template</pre>
+              <pre>template</pre>
             </v-expansion-panel-header>
             <v-expansion-panel-content>
               The top level structure must be of the following form:
@@ -87,7 +87,7 @@ interface JSZip {
           </v-expansion-panel>
           <v-expansion-panel>
             <v-expansion-panel-header>
-              <pre>Global functions</pre>
+              <pre>global functions</pre>
             </v-expansion-panel-header>
             <v-expansion-panel-content>
               This site uses a
@@ -129,7 +129,7 @@ dump(exif: IExif) => string
                 </v-expansion-panel>
                 <v-expansion-panel>
                   <v-expansion-panel-header>
-                    <pre>dump</pre>
+                    <pre>insert</pre>
                   </v-expansion-panel-header>
                   <v-expansion-panel-content>
                     Saves the new EXIF data to the input content (image) and returns a byte string

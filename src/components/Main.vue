@@ -4,15 +4,20 @@
       <v-flex md6>
         <v-card class="pa-5 mt-5">
           <v-card-title>Open ZIP-file</v-card-title>
-          <v-card-subtitle>Create your own scripts by clicking "Show script view" in the top right corner or select one of the preset script from below.</v-card-subtitle>
+          <v-card-subtitle>Create your own scripts by clicking "Show script view" in the top right corner or select one of the preset scripts from below.</v-card-subtitle>
           <v-flex>
             <v-select
               v-model="selectedPreset"
               :items="presetCode"
               outlined
               label="Presets"
+              class="mb-1"
               @change="setPresetCode"
             ></v-select>
+            <v-card class="pt-0 mb-5" outlined>
+              <v-card-title>Description</v-card-title>
+              <v-card-text class="pt-0" v-html="selectedPresetDescription"></v-card-text>
+            </v-card>
           </v-flex>
           <v-divider></v-divider>
           <v-card-text class="pt-5">
@@ -44,6 +49,7 @@
               <Reference></Reference>
             </v-col>
           </v-row>
+          <v-divider></v-divider>
           <v-row class="pt-5">
             <v-col md-9>
               <v-select
@@ -108,6 +114,7 @@ export default class Main extends Vue {
   private blob?: Blob;
   private presetCode = presetCode.map(element => element.text);
   private selectedPreset = presetCode[0].text;
+  private selectedPresetDescription = presetCode[0].description;
 
   private mounted() {
     this.flask = new CodeFlask('#code', { language: 'js', lineNumbers: true });
@@ -118,6 +125,7 @@ export default class Main extends Vue {
   private setPresetCode(selected: string) {
     console.log(selected);
     var code = presetCode.find(el => el.text === selected);
+    this.selectedPresetDescription = presetCode.find(el => el.text === selected)!.description;
     if (code) {
       this.flask!.updateCode(code.value);
     }

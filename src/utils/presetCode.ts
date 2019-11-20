@@ -1,6 +1,7 @@
 export const presetCode = [
   {
-    text: 'WhatsApp image backup fix',
+    text: 'WhatsApp backup fix',
+    description: 'This preset fixes the date taken field for images that are restored from backup for WhatsApp on Android. See the <a href="https://holwech.github.io/blog/Fixing-WhatsApp-Backup/" target="_blank">following article</a> for more information.',
     value: `{
   settings: {
     re: /(.jpg|.png|.gif|.jpeg)$/,
@@ -11,30 +12,32 @@ export const presetCode = [
     }
   },
   process: (relativePath, entry, content, newZip, settings) => {
-    if (!settings.re.test(entry.name)) {
-      return;
-    }
-    const exif = load(content);
     let dateStr = relativePath.split('-')[1];
     let year = parseInt(dateStr.substring(0, 4));
     let month = parseInt(dateStr.substring(4, 6));
     let day = parseInt(dateStr.substring(6));
-    if (exif.Exif) {
-      exif.Exif[TagValues.ExifIFD.DateTimeOriginal] = year + ":" + settings.pad(month, 2) + ":" + settings.pad(day, 2) + " 00:00:00";
-    } else {
-      exif.Exif = {
-        [TagValues.ExifIFD.DateTimeOriginal]: year + ":" + settings.pad(month, 2) + ":" + settings.pad(day, 2) + " 00:00:00",
-      };
+    if (settings.re.test(entry.name)) {
+      const exif = load(content);
+      if (exif.Exif) {
+        exif.Exif[TagValues.ExifIFD.DateTimeOriginal] = year + ":" + settings.pad(month, 2) + ":" + settings.pad(day, 2) + " 00:00:00";
+      } else {
+        exif.Exif = {
+          [TagValues.ExifIFD.DateTimeOriginal]: year + ":" + settings.pad(month, 2) + ":" + settings.pad(day, 2) + " 00:00:00",
+        };
+      }
+      const exifBytes = dump(exif);
+      content = insert(exifBytes, content);
     }
-    const exifBytes = dump(exif);
-    content = insert(exifBytes, content);
-    newZip.file(entry.name, content, { binary: true });
+    console.log(year, month, day);
+    console.log(new Date(year, month - 1, day));
+    newZip.file(entry.name, content, { binary: true, date: new Date(year, month, day) });
   }
 }
 `
   },
   {
     text: 'Strip all EXIF',
+    description: 'Removes all EXIF data from all images.',
     value: `{
   settings: {
     re: /(.jpg|.png|.gif|.jpeg)$/,
@@ -52,6 +55,7 @@ export const presetCode = [
   },
   {
     text: 'Strip date taken EXIF',
+    description: 'Removes the date taken information from all images.',
     value: `{
   settings: {},
   process: (relativePath, entry, content, newZip, settings) => {

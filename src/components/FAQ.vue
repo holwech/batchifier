@@ -4,7 +4,10 @@
       <v-flex md6>
         <v-card class="pa-5 mt-5">
           <v-card-title>FAQ</v-card-title>
-          <v-card-text class="darken-2">Some text about the service</v-card-text>
+          <v-card outlined>
+            <v-card-title>A question</v-card-title>
+            <v-card-text>An answer</v-card-text>
+          </v-card>
         </v-card>
       </v-flex>
     </v-layout>
