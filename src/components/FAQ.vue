@@ -5,8 +5,8 @@
         <v-card class="pa-5 mt-5">
           <v-card-title>FAQ</v-card-title>
           <v-card outlined>
-            <v-card-title>A question</v-card-title>
-            <v-card-text>An answer</v-card-text>
+            <v-card-title>Will you steal my pictures?</v-card-title>
+            <v-card-text>No I will not and cannot. All pictures are processed in your browser and that is where they will stay.</v-card-text>
           </v-card>
         </v-card>
       </v-flex>

@@ -229,4 +229,8 @@ export default class Main extends Vue {
 .v-expansion-panel:before {
   box-shadow: none !important;
 }
+
+.v-card__text {
+  color: #424242 !important;
+}
 </style>
