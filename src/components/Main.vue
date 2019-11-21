@@ -42,7 +42,7 @@
         <v-card class="pa-5 mt-5">
           <v-card-title>Run custom scripts</v-card-title>
           <v-card-text
-            style="color: red;"
+            style="color: red !important;"
           >WARNING - Running custom scripts in your browser can be DANGEROUS. Do not copy paste and run scripts if you do not know what they are doing and/or are from a source you do not trust. I do not take any responsbility for damage or harm caused by using this tool.</v-card-text>
           <v-row class="pb-5">
             <v-col md-12>
@@ -233,4 +233,6 @@ export default class Main extends Vue {
 .v-card__text {
   color: #424242 !important;
 }
+
+
 </style>
