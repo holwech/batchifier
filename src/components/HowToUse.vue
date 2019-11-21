@@ -5,7 +5,7 @@
         <v-card class="pa-5 mt-5">
           <v-card-title>How to use</v-card-title>
           <v-card-text class="darken-2">
-            Batchifier is a web app that runs purely in your browser and allows you to edit the EXIF data of your images.
+            BATCHIFIER is a web app that runs purely in your browser and allows you to edit the EXIF data of your images.
             Regardless of the script you choose to run, the images have to be compressed into a zip-file.
             <br />
             <br />To zip your images simply select the images you want to edit and right click on them.

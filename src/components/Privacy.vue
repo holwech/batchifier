@@ -5,8 +5,10 @@
         <v-card class="mt-5 pa-10">
           <v-card-title>Privacy</v-card-title>
           <v-card-text class="darken-2">
-            Batchifier runs purely in your browser and thus your images are not at any point uploaded to some backend server or in any way stored externally.
-            If you do not trust me? You can disconnect your computer from the internet and you will see that the application runs perfectly without the connection :)
+            BATCHIFIER runs purely in your browser and thus your images are not at any point uploaded to some backend server or in any way stored externally.
+            In case you do not trust me - disconnect your computer from the internet and you will see that the application runs perfectly without the connection :)
+            <br /><br />
+            Backend analytics from Netlify is used to track page views and traffic.
           </v-card-text>
         </v-card>
       </v-flex>
