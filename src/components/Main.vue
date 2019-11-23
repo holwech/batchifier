@@ -22,8 +22,9 @@
           <v-divider></v-divider>
           <v-card-text class="pt-5">
             <v-file-input outlined dense label="File input" accept=".zip" @change="openFile"></v-file-input>
+            <v-alert v-if="appState.showAlert" type="error">{{alertMessage}}</v-alert>
             <v-progress-linear
-              v-if="progress.started"
+              v-if="progress.started && !appState.showAlert"
               v-model="getProgress"
               height="25"
               :color="getProgress == 100 ? 'green' : 'blue-grey'"
@@ -68,6 +69,7 @@
               >{{ appState.invalidCode ? 'Invalid' : 'Valid' }}</v-btn>
             </v-col>
           </v-row>
+          <v-alert :class="{ hide: !appState.showCodeError }" type="error">{{codeErrorMessage}}</v-alert>
           <v-row>
             <div id="code"></div>
           </v-row>
@@ -100,10 +102,14 @@ export default class Main extends Vue {
   private zipEditor: ZipEditor = new ZipEditor();
   private file?: File;
   private processBtnText = 'Process';
+  private alertMessage = '';
+  private codeErrorMessage = '';
   private appState = {
     invalidCode: false,
     fileAdded: false,
     showScriptWindow: false,
+    showAlert: false,
+    showCodeError: false,
   };
   private progress = {
     total: 0,
@@ -142,10 +148,17 @@ export default class Main extends Vue {
       code: this.flask!.getCode(),
       progress: this.progress,
     };
-    this.zipEditor.openFile(this.file!, payload).then(blob => {
-      this.blob = blob;
-      this.progress.done = true;
-    });
+    this.zipEditor
+      .openFile(this.file!, payload)
+      .then(blob => {
+        this.blob = blob;
+        this.progress.done = true;
+      })
+      .catch(reason => {
+        console.error(reason);
+        this.alertMessage = reason;
+        this.appState.showAlert = true;
+      });
   }
 
   private download() {
@@ -159,9 +172,12 @@ export default class Main extends Vue {
   private evaluateCode(): Code | undefined {
     try {
       this.appState.invalidCode = false;
+      this.appState.showCodeError = false;
       return Function(`"use strict";return (${this.flask!.getCode()});`)() as Code;
     } catch (error) {
       this.appState.invalidCode = true;
+      this.codeErrorMessage = error;
+      this.appState.showCodeError = true;
       this.appState.fileAdded = false;
       console.log(error);
       return;
@@ -171,6 +187,7 @@ export default class Main extends Vue {
   private openFile(event: File) {
     this.file = event;
     this.appState.fileAdded = true;
+    this.appState.showAlert = false;
     this.evaluateCode();
     this.progress = {
       total: 0,
@@ -234,5 +251,8 @@ export default class Main extends Vue {
   color: #424242 !important;
 }
 
-
+.hide {
+  visibility: hidden;
+}
 </style>
+

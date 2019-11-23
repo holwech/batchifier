@@ -45,11 +45,15 @@ export default class ZipEditor {
 
     const promises = Array<Promise<void>>();
     decoded.forEach((relativePath: string, file: JSZipObject): void => {
-      promises.push(new Promise(async (resolve) => {
-        var content = await file.async('binarystring');
-        code.process(relativePath, file, content, newZip, code.settings);
-        payload.progress.count++;
-        resolve();
+      promises.push(new Promise(async (resolve, reject) => {
+        try {
+          var content = await file.async('binarystring');
+          code.process(relativePath, file, content, newZip, code.settings);
+          payload.progress.count++;
+          resolve();
+        } catch (e) {
+          reject(e);
+        }
       }));
     });
     await Promise.all(promises);
