@@ -7,8 +7,8 @@
           <v-card-text class="darken-2">
             BATCHIFIER runs purely in your browser and thus your images are not at any point uploaded to some backend server or in any way stored externally.
             In case you do not trust me - disconnect your computer from the internet and you will see that the application runs perfectly without the connection :)
-            <br /><br />
-            Backend analytics from Netlify is used to track page views and traffic.
+            <br />
+            <br />Backend analytics from Netlify is used to track page views and traffic. No other tracking tools or cookies are used.
           </v-card-text>
         </v-card>
       </v-flex>
