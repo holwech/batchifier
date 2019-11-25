@@ -28,8 +28,6 @@ export const presetCode = [
       const exifBytes = dump(exif);
       content = insert(exifBytes, content);
     }
-    console.log(year, month, day);
-    console.log(new Date(year, month - 1, day));
     newZip.file(entry.name, content, { binary: true, date: new Date(year, month, day) });
   }
 }

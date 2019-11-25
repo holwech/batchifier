@@ -29,6 +29,8 @@ export interface Payload {
   progress: {
     total: number;
     count: number;
+    done: boolean;
+    preparingDownload: boolean;
   }
 }
 
@@ -57,7 +59,10 @@ export default class ZipEditor {
       }));
     });
     await Promise.all(promises);
+    payload.progress.done = true;
+    payload.progress.preparingDownload = true;
     const blob = await newZip.generateAsync({ type: 'blob' });
+    payload.progress.preparingDownload = false;
     return blob;
   }
 
@@ -67,57 +72,5 @@ export default class ZipEditor {
       ` "use strict";
       return (${code});
     `)(load, dump, insert, TagValues) as Code;
-  }
-
-  public processFile(
-    relativePath: string,
-    entry: JSZipObject,
-    content: string,
-    newZip: JSZip,
-    settings: any,
-  ): void {
-    if (!settings.re.test(entry.name)) {
-      return;
-    }
-    const exif = load(content);
-    if (exif.Exif) {
-      exif.Exif[TagValues.ExifIFD.DateTimeOriginal] = '2010:10:10 10:10:10';
-    } else {
-      exif.Exif = {
-        [TagValues.ExifIFD.DateTimeOriginal]: '2010:10:10 10:10:10',
-      };
-    }
-    const exifBytes = dump(exif);
-    content = insert(exifBytes, content);
-    const name = entry.name.split('.');
-    newZip.file(name[0] + '_modified.' + name[1], content, { binary: true });
-  }
-
-  public async decodeEntry(relativePath: string, zipEntry: JSZipObject, outputType: OutputType): Promise<FileContent> {
-    const content = await zipEntry.async(outputType);
-    return {
-      name: zipEntry.name,
-      relativePath,
-      content,
-      outputType,
-    };
-  }
-
-  private setup(): { [key: string]: any } {
-    return {
-      re: /(.jpg|.png|.gif|.ps|.jpeg)$/,
-    };
-  }
-
-  private loadFile(file: File): Promise<string | null> {
-    return new Promise<string | null>((resolve, reject) => {
-      const reader = new FileReader();
-
-      reader.onload = async (event: Event) => {
-        const decoder = new TextDecoder('utf-8');
-        resolve(decoder.decode(reader.result as ArrayBuffer));
-      };
-      reader.readAsArrayBuffer((file as any) as Blob);
-    });
   }
 }

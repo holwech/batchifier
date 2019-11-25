@@ -35,7 +35,15 @@
           </v-card-text>
           <v-card-actions>
             <v-btn :disabled="!appState.fileAdded" @click="process">{{ processBtnText }}</v-btn>
-            <v-btn v-if="progress.done" class="success" @click="download">Download</v-btn>
+            <v-btn
+              v-if="progress.done"
+              :disabled="progress.preparingDownload"
+              class="success"
+              @click="download"
+            >
+              <v-progress-circular v-if="progress.preparingDownload" :size="25" indeterminate></v-progress-circular>
+              {{ progress.preparingDownload ? "Preparing download..." : "Download" }}
+            </v-btn>
           </v-card-actions>
         </v-card>
       </v-flex>
@@ -115,6 +123,7 @@ export default class Main extends Vue {
     total: 0,
     count: 0,
     done: false,
+    preparingDownload: false,
     started: false,
   };
   private blob?: Blob;
@@ -142,6 +151,7 @@ export default class Main extends Vue {
       total: 0,
       count: 0,
       done: false,
+      preparingDownload: false,
       started: true,
     };
     const payload: Payload = {
@@ -152,7 +162,6 @@ export default class Main extends Vue {
       .openFile(this.file!, payload)
       .then(blob => {
         this.blob = blob;
-        this.progress.done = true;
       })
       .catch(reason => {
         console.error(reason);
@@ -193,6 +202,7 @@ export default class Main extends Vue {
       total: 0,
       count: 0,
       done: false,
+      preparingDownload: false,
       started: false,
     };
   }

@@ -10,11 +10,19 @@
           </v-card>
           <v-card outlined class="mb-5">
             <v-card-title>Are there any limitations in terms of the size of the zip file?</v-card-title>
-            <v-card-text>Yes, probably, but I have not tested the limits so I do not know. Feedback appreciated!</v-card-text>
+            <v-card-text>
+              Yes,
+              <a href="https://github.com/eligrey/FileSaver.js/">there are</a>. I have not tested the limits so I do not know for sure, but probably max 800MB for Firefox and 2GB for Chrome. Feedback appreciated!
+            </v-card-text>
+          </v-card>
+          <v-card outlined class="mb-5">
+            <v-card-title>Which browsers does this application support?</v-card-title>
+            <v-card-text>Yes</v-card-text>
           </v-card>
           <v-card outlined class="mb-5">
             <v-card-title>What is the tech stack used for this application?</v-card-title>
-            <v-card-text>The frontend application is built using Vue + Typescript and Vuetify for components/styling.
+            <v-card-text>
+              The frontend application is built using Vue + Typescript and Vuetify for components/styling.
               CodeFlask is used for the code editor.
               The application is hosted using Netlify.
             </v-card-text>
