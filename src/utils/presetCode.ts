@@ -12,14 +12,16 @@ export const presetCode = [
     }
   },
   process: (relativePath, entry, content, newZip, settings) => {
-    let dateStr = relativePath.split('-')[1];
+    let dateStr = relativePath.split(/[_-]/)[1];
     let year = parseInt(dateStr.substring(0, 4));
     let month = parseInt(dateStr.substring(4, 6));
     let day = parseInt(dateStr.substring(6));
     if (settings.re.test(entry.name)) {
       const exif = load(content);
       if (exif.Exif) {
-        exif.Exif[TagValues.ExifIFD.DateTimeOriginal] = year + ":" + settings.pad(month, 2) + ":" + settings.pad(day, 2) + " 00:00:00";
+        if (!exif.Exif[TagValues.ExifIFD.DateTimeOriginal]) {
+          exif.Exif[TagValues.ExifIFD.DateTimeOriginal] = year + ":" + settings.pad(month, 2) + ":" + settings.pad(day, 2) + " 00:00:00";
+        }
       } else {
         exif.Exif = {
           [TagValues.ExifIFD.DateTimeOriginal]: year + ":" + settings.pad(month, 2) + ":" + settings.pad(day, 2) + " 00:00:00",
