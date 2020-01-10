@@ -30,7 +30,7 @@ export const presetCode = [
       const exifBytes = dump(exif);
       content = insert(exifBytes, content);
     }
-    newZip.file(entry.name, content, { binary: true, date: new Date(year, month, day) });
+    newZip.file(entry.name, content, { binary: true, date: new Date(year, month - 1, day, 1, 1, 1) });
   }
 }
 `
