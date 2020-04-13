@@ -8,7 +8,7 @@
       </router-link>
       <div
         class="subheading pl-5 font-weight-light"
-      >batch edit EXIF data safely and securely in the browser</div>
+      >batch edit EXIF data safe and securely in the browser</div>
       <v-spacer />
       <v-btn text to="/howtouse" class="mr-3">How to use</v-btn>
       <v-btn outlined @click="toggleShowScript">{{ showScript ? "Hide" : "Show"}} script view</v-btn>
