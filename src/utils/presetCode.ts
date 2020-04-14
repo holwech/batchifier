@@ -29,7 +29,7 @@ export const presetCode = [
       }
       const exifBytes = dump(exif);
       content = insert(exifBytes, content);
-      newZip.file(entry.name, content, { binary: true, date: new Date(year, month - 1, day, 0 - new Date().getTimezoneOffset() / 60, 0, 0) });
+      newZip.file(entry.name, content, { binary: true, date: new Date(year, month - 1, day, 12 - new Date().getTimezoneOffset() / 60, 0, 0) });
     }
   }
 }
