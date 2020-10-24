@@ -1,90 +1,101 @@
 <template>
-  <v-container fluid grid-list-xl>
-    <v-layout row wrap justify-center grid-list-xl>
-      <v-flex md6>
-        <v-card class="pa-5 mt-5">
-          <v-card-title>Open ZIP-file</v-card-title>
-          <v-card-subtitle>Create your own scripts by clicking "Show script view" in the top right corner or select one of the preset scripts from below.</v-card-subtitle>
-          <v-flex>
-            <v-select
-              v-model="selectedPreset"
-              :items="presetCode"
-              outlined
+  <b-row class="justify-content-md-center">
+    <b-col cols=6>
+      <b-card title="Open ZIP file" sub-title="Create your own scripts by clicking 'Show script view' in the top right corner or select one of the preset scripts from below.">
+        <b-form-group
+          id="input-code-select"
+          label="Presets"
+          label-for="code-select"
+        >
+          <b-form-select
+            v-model="selectedPreset"
+            :options="presetCode"
+            outlined
+            label="Presets"
+            class="mb-1"
+            id="code-select"
+            @change="setPresetCode"
+          ></b-form-select>
+        </b-form-group>
+        <b-card-body>
+          <b-card-title>
+            Description
+          </b-card-title> 
+          <b-card-text
+            v-html="selectedPresetDescription"
+          >
+          </b-card-text>
+        </b-card-body>
+        <hr>
+        <b-form-file
+          @change="openFile"
+          placeholder="Choose a ZIP file or drop it here..."
+          drop-placeholder="Drop ZIP here..."
+          accept=".zip"
+        ></b-form-file>
+        <b-card-text>
+          <b-alert :show="appState.showAlert" variant="danger" style="margin-top: 10px;">{{alertMessage}}</b-alert>
+          <b-progress
+            v-if="progress.started && !appState.showAlert"
+            :value="getProgress"
+            :variant="getProgress == 100 ? 'green' : 'blue-grey'"
+          ></b-progress>
+        </b-card-text>
+        <b-card-body>
+          <b-button :disabled="!appState.fileAdded" @click="process">{{ processBtnText }}</b-button>
+          <b-button
+            v-if="progress.done"
+            :disabled="progress.preparingDownload"
+            class="success"
+            @click="download"
+          >
+            <b-spinner v-if="progress.preparingDownload" label="Spinning"></b-spinner>
+            {{ progress.preparingDownload ? "Preparing download..." : "Download" }}
+          </b-button>
+        </b-card-body>
+      </b-card>
+    </b-col>
+    <b-col cols=6 :class="{ hide: !showScript }">
+      <b-card title="Run custom scripts">
+        <b-card-text
+          style="color: red !important;"
+        >WARNING - Running custom scripts in your browser can be DANGEROUS. Do not copy paste and run scripts if you do not know what they are doing and/or are from a source you do not trust. I do not take any responsbility for damage or harm caused by using this tool.</b-card-text>
+        <Reference></Reference>
+        <hr>
+        <b-row align-v="center">
+          <b-col>
+            <b-form-group
+              id="input-code-select"
               label="Presets"
-              class="mb-1"
-              @change="setPresetCode"
-            ></v-select>
-            <v-card class="pt-0 mb-5" outlined>
-              <v-card-title>Description</v-card-title>
-              <v-card-text class="pt-0" v-html="selectedPresetDescription"></v-card-text>
-            </v-card>
-          </v-flex>
-          <v-divider></v-divider>
-          <v-card-text class="pt-5">
-            <v-file-input outlined dense label="File input" accept=".zip" @change="openFile"></v-file-input>
-            <v-alert v-if="appState.showAlert" type="error">{{alertMessage}}</v-alert>
-            <v-progress-linear
-              v-if="progress.started && !appState.showAlert"
-              v-model="getProgress"
-              height="25"
-              :color="getProgress == 100 ? 'green' : 'blue-grey'"
-              reactive
+              label-for="code-select"
             >
-              <strong>{{ getProgress }}%</strong>
-            </v-progress-linear>
-          </v-card-text>
-          <v-card-actions>
-            <v-btn :disabled="!appState.fileAdded" @click="process">{{ processBtnText }}</v-btn>
-            <v-btn
-              v-if="progress.done"
-              :disabled="progress.preparingDownload"
-              class="success"
-              @click="download"
-            >
-              <v-progress-circular v-if="progress.preparingDownload" :size="25" indeterminate></v-progress-circular>
-              {{ progress.preparingDownload ? "Preparing download..." : "Download" }}
-            </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-flex>
-      <v-flex :class="{ hide: !showScript }" md6>
-        <v-card class="pa-5 mt-5">
-          <v-card-title>Run custom scripts</v-card-title>
-          <v-card-text
-            style="color: red !important;"
-          >WARNING - Running custom scripts in your browser can be DANGEROUS. Do not copy paste and run scripts if you do not know what they are doing and/or are from a source you do not trust. I do not take any responsbility for damage or harm caused by using this tool.</v-card-text>
-          <v-row class="pb-5">
-            <v-col md-12>
-              <Reference></Reference>
-            </v-col>
-          </v-row>
-          <v-divider></v-divider>
-          <v-row class="pt-5">
-            <v-col md-9>
-              <v-select
+              <b-form-select
                 v-model="selectedPreset"
-                :items="presetCode"
+                :options="presetCode"
                 outlined
                 label="Presets"
                 @change="setPresetCode"
-              ></v-select>
-            </v-col>
-            <v-col md-3>
-              <v-btn
-                :class="{ error: appState.invalidCode, success: !appState.invalidCode }"
-                class="mb-2"
-                text
-              >{{ appState.invalidCode ? 'Invalid' : 'Valid' }}</v-btn>
-            </v-col>
-          </v-row>
-          <v-alert :class="{ hide: !appState.showCodeError }" type="error">{{codeErrorMessage}}</v-alert>
-          <v-row>
-            <div id="code"></div>
-          </v-row>
-        </v-card>
-      </v-flex>
-    </v-layout>
-  </v-container>
+              ></b-form-select>
+            </b-form-group>
+          </b-col>
+          <b-col>
+            <b-btn
+              :class="{ error: appState.invalidCode, success: !appState.invalidCode }"
+              :variant="appState.invalidCode ? 'danger' : 'success'"
+              class="mb-2"
+              text
+            >{{ appState.invalidCode ? 'Invalid' : 'Valid' }}</b-btn>
+          </b-col>
+        </b-row>
+        <b-row>
+          <b-alert :show="appState.showCodeError" variant="danger">hei {{codeErrorMessage}}</b-alert>
+        </b-row>
+        <b-row>
+          <div id="code"></div>
+        </b-row>
+      </b-card>
+    </b-col>
+  </b-row>
 </template>
 
 <script lang="ts">
@@ -130,6 +141,7 @@ export default class Main extends Vue {
   private presetCode = presetCode.map(element => element.text);
   private selectedPreset = presetCode[0].text;
   private selectedPresetDescription = presetCode[0].description;
+  private showReference: boolean = false;
 
   private mounted() {
     this.flask = new CodeFlask('#code', { language: 'js', lineNumbers: true });
