@@ -1,16 +1,17 @@
 <template>
-  <v-expansion-panels>
-    <v-expansion-panel>
-      <v-expansion-panel-header>Documentation</v-expansion-panel-header>
-      <v-expansion-panel-content>
-        <v-expansion-panels>
-          <v-expansion-panel>
-            <v-expansion-panel-header>
+  <div class="accordion" role="tablist" style="padding-bottom:20px;">
+    <b-card no-body class="mb-1">
+      <b-card-header header-tag="header" class="p-1" role="tab">
+        <b-button block v-b-toggle.accordion-1 variant="light">Documentation</b-button>
+      </b-card-header>
+      <b-collapse id="accordion-1" accordion="my-accordion" role="tabpanel">
+        <b-card-body>
+          <b-card-title>
               <pre>template</pre>
-            </v-expansion-panel-header>
-            <v-expansion-panel-content>
-              The top level structure must be of the following form:
-              <pre>
+          </b-card-title>
+          <b-card-text>
+            The top level structure must be of the following form:
+<pre>
 {
   settings: {
     // content here
@@ -22,19 +23,19 @@
   }
 }
               </pre>
-            </v-expansion-panel-content>
-          </v-expansion-panel>
-          <v-expansion-panel>
-            <v-expansion-panel-header>
-              <pre>settings</pre>
-            </v-expansion-panel-header>
-            <v-expansion-panel-content>Is run once and allows you to set create initial values, objects or functions that can be used when iterating through the images.</v-expansion-panel-content>
-          </v-expansion-panel>
-          <v-expansion-panel>
-            <v-expansion-panel-header>
-              <pre>process</pre>
-            </v-expansion-panel-header>
-            <v-expansion-panel-content>
+          </b-card-text>
+          <hr>
+          <b-card-title>
+            <pre>settings</pre>
+          </b-card-title>
+          <b-card-text>
+            Is run once and allows you to set create initial values, objects or functions that can be used when iterating through the images.
+          </b-card-text>
+          <hr>
+          <b-card-title>
+            <pre>process</pre>
+          </b-card-title>
+          <b-card-text>
               Is the main function that is run for each image in the input zip file. This functions must have the following input/output definition:
               <pre>
 
@@ -44,16 +45,13 @@
  newZip: JSZip,
  settings: any) => string
 
- </pre>
-              <v-expansion-panels>
-                <v-expansion-panel>
-                  <v-expansion-panel-header>
-                    <pre>JSZipObject</pre>
-                  </v-expansion-panel-header>
-                  <v-expansion-panel-content>
-                    <pre>
-
-
+            </pre>
+          </b-card-text>
+          <b-card-sub-title>
+            <pre>JSZipObject</pre>
+          </b-card-sub-title>
+          <b-card-text>
+            <pre>
 interface JSZipObject {
     name: string;
     dir: boolean;
@@ -64,32 +62,23 @@ interface JSZipObject {
     /** The UNIX permissions of the file, if any. */
     dosPermissions: number | null;
 }
-
-                    </pre>
-                  </v-expansion-panel-content>
-                </v-expansion-panel>
-                <v-expansion-panel>
-                  <v-expansion-panel-header>
-                    <pre>JSZip</pre>
-                  </v-expansion-panel-header>
-                  <v-expansion-panel-content>
-                    <pre>
-
+            </pre>
+          </b-card-text>
+          <b-card-sub-title>
+            <pre>JSZip</pre>
+          </b-card-sub-title>
+          <b-card-text>
+            <pre>
 interface JSZip {
   file(name: string, content: string, type: object);
 }
-
-                    </pre>
-                  </v-expansion-panel-content>
-                </v-expansion-panel>
-              </v-expansion-panels>
-            </v-expansion-panel-content>
-          </v-expansion-panel>
-          <v-expansion-panel>
-            <v-expansion-panel-header>
-              <pre>global functions</pre>
-            </v-expansion-panel-header>
-            <v-expansion-panel-content>
+            </pre>
+          </b-card-text>
+          <hr>
+          <b-card-title>
+            <pre>global functions</pre>
+          </b-card-title>
+          <b-card-text>
               This site uses a
               <a
                 href="https://github.com/holwech/piexif-ts"
@@ -100,64 +89,47 @@ interface JSZip {
               <a
                 href="https://piexifjs.readthedocs.io/en/latest/index.html"
               >documentation</a> for the original code to understand how to use this library, but just be aware of this difference between the two.
-              <v-expansion-panels>
-                <v-expansion-panel>
-                  <v-expansion-panel-header>
-                    <pre>load</pre>
-                  </v-expansion-panel-header>
-                  <v-expansion-panel-content>
-                    Loads the EXIF data of some content (image) and returns it as an IExif object
-                    <pre>
-
+          </b-card-text>
+          <b-card-sub-title>
+            <pre>load</pre>
+          </b-card-sub-title>
+          <b-card-text>
+            Loads the EXIF data of some content (image) and returns it as an IExif object
+            <pre>
 load(content: string) => IExif
-
-                    </pre>
-                  </v-expansion-panel-content>
-                </v-expansion-panel>
-                <v-expansion-panel>
-                  <v-expansion-panel-header>
-                    <pre>dump</pre>
-                  </v-expansion-panel-header>
-                  <v-expansion-panel-content>
-                    Returns a byte dump of the EXIF input object as a byte string
-                    <pre>
-
+            </pre>
+          </b-card-text>
+          <b-card-sub-title>
+            <pre>dump</pre>
+          </b-card-sub-title>
+          <b-card-text>
+            Returns a byte dump of the EXIF input object as a byte string
+            <pre>
 dump(exif: IExif) => string
-
-                    </pre>
-                  </v-expansion-panel-content>
-                </v-expansion-panel>
-                <v-expansion-panel>
-                  <v-expansion-panel-header>
-                    <pre>insert</pre>
-                  </v-expansion-panel-header>
-                  <v-expansion-panel-content>
-                    Saves the new EXIF data to the input content (image) and returns a byte string
-                    <pre>
-
+            </pre>
+          </b-card-text>
+          <b-card-sub-title>
+            <pre>insert</pre>
+          </b-card-sub-title>
+          <b-card-text>
+            Saves the new EXIF data to the input content (image) and returns a byte string
+            <pre>
 insert(exifBytes: string, content) => string
-
-                    </pre>
-                  </v-expansion-panel-content>
-                </v-expansion-panel>
-                <v-expansion-panel>
-                  <v-expansion-panel-header>
-                    <pre>TagValues</pre>
-                  </v-expansion-panel-header>
-                  <v-expansion-panel-content>
-                    Defined the EXIF key values. This object is defined here:
-                    <a
-                      href="https://github.com/holwech/piexif-ts/blob/master/src/constants.ts#L11611"
-                    >TagValues</a>
-                  </v-expansion-panel-content>
-                </v-expansion-panel>
-              </v-expansion-panels>
-            </v-expansion-panel-content>
-          </v-expansion-panel>
-        </v-expansion-panels>
-      </v-expansion-panel-content>
-    </v-expansion-panel>
-  </v-expansion-panels>
+            </pre>
+          </b-card-text>
+          <b-card-sub-title>
+            <pre>TagValues</pre>
+          </b-card-sub-title>
+          <b-card-text>
+            Defined the EXIF key values. This object is defined here:
+            <a
+              href="https://github.com/holwech/piexif-ts/blob/master/src/constants.ts#L11611"
+            >TagValues</a>
+          </b-card-text>
+        </b-card-body>
+      </b-collapse>
+    </b-card>
+  </div>
 </template>
 
 <script lang="ts">
