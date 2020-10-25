@@ -1,27 +1,13 @@
 <template>
-  <v-footer padless>
-    <v-row justify="center" no-gutters>
-      <v-btn text rounded small class="my-2" to="/about">About</v-btn>
-      <v-btn text rounded small class="my-2" to="/faq">FAQ</v-btn>
-      <v-btn text rounded small class="my-2" to="/privacy">Privacy</v-btn>
-      <v-btn
-        text
-        rounded
-        small
-        class="my-2"
-        href="https://github.com/holwech/batchifier"
-        target="_blank"
-      >GitHub</v-btn>
-      <v-btn
-        text
-        rounded
-        small
-        class="my-2"
-        href="https://github.com/holwech/batchifier"
-        target="blank"
-      >Contribute</v-btn>
-    </v-row>
-  </v-footer>
+  <b-navbar id="footer" variant="light" class="justify-content-md-center fixed-bottom">
+    <b-button variant="link-dark" to="/about">About</b-button>
+    <b-button variant="link-dark" to="/faq">FAQ</b-button>
+    <b-button variant="link-dark" to="/privacy">Privacy</b-button>
+    |
+    <b-button variant="link-dark" href="https://github.com/holwech/batchifier" target="_blank">Github</b-button>
+    <b-button variant="link-dark" href="https://holwech.github.io" target="_blank">Blog</b-button>
+    <b-button variant="link-dark" href="https://www.pandemicstatus.today/" target="_blank">Pandemic status</b-button>
+  </b-navbar>
 </template>
 
 <script lang="ts">

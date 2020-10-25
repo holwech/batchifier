@@ -28,7 +28,7 @@
         </b-card-body>
         <hr>
         <b-form-file
-          @change="openFile"
+          @input="openFile"
           placeholder="Choose a ZIP file or drop it here..."
           drop-placeholder="Drop ZIP here..."
           accept=".zip"
@@ -38,21 +38,22 @@
           <b-progress
             v-if="progress.started && !appState.showAlert"
             :value="getProgress"
-            :variant="getProgress == 100 ? 'green' : 'blue-grey'"
+            show-value
+            :variant="getProgress == 100 ? 'success' : 'dark'"
+            style="margin-top: 10px;"
           ></b-progress>
         </b-card-text>
-        <b-card-body>
-          <b-button :disabled="!appState.fileAdded" @click="process">{{ processBtnText }}</b-button>
-          <b-button
-            v-if="progress.done"
-            :disabled="progress.preparingDownload"
-            class="success"
-            @click="download"
-          >
-            <b-spinner v-if="progress.preparingDownload" label="Spinning"></b-spinner>
-            {{ progress.preparingDownload ? "Preparing download..." : "Download" }}
-          </b-button>
-        </b-card-body>
+        <b-button :disabled="!appState.fileAdded" @click="process">{{ processBtnText }}</b-button>
+        <b-button
+          v-if="progress.done"
+          :disabled="progress.preparingDownload"
+          variant="success"
+          @click="download"
+          style="margin-left: 10px;"
+        >
+          <b-spinner small v-if="progress.preparingDownload" label="Spinning"></b-spinner>
+          {{ progress.preparingDownload ? "Preparing download..." : "Download" }}
+        </b-button>
       </b-card>
     </b-col>
     <b-col cols=6 :class="{ hide: !showScript }">
@@ -88,7 +89,7 @@
           </b-col>
         </b-row>
         <b-row>
-          <b-alert :show="appState.showCodeError" variant="danger">hei {{codeErrorMessage}}</b-alert>
+          <b-alert :show="appState.showCodeError" variant="danger">{{codeErrorMessage}}</b-alert>
         </b-row>
         <b-row>
           <div id="code"></div>
@@ -206,6 +207,7 @@ export default class Main extends Vue {
   }
 
   private openFile(event: File) {
+    console.log(event)
     this.file = event;
     this.appState.fileAdded = true;
     this.appState.showAlert = false;
@@ -241,37 +243,15 @@ export default class Main extends Vue {
 }
 
 #code * {
-  font-family: 'Liberation Mono';
   font-size: 14px;
   box-sizing: border-box;
 }
 
 #code .codeflask {
   height: 600px;
-  width: 800px;
+  width: 98%;
 }
 
-#code .codeflask__code::before,
-#code .codeflask__code::after {
-  all: unset;
-}
-
-#code .codeflask__pre,
-#code .codeflask__code {
-  background: none;
-}
-
-#code .codeflask__code {
-  box-shadow: unset;
-}
-
-.v-expansion-panel:before {
-  box-shadow: none !important;
-}
-
-.v-card__text {
-  color: #424242 !important;
-}
 
 .hide {
   visibility: hidden;
