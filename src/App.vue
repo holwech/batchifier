@@ -17,9 +17,10 @@
         </b-navbar-nav>
       </b-collapse>
     </b-navbar>  
-    <b-container id="main-container">
+    <b-container fluid id="main-container">
       <router-view :show-script="showScript"></router-view>
     </b-container>
+    <Footer></Footer>
   </div>
 </template>
 
@@ -50,5 +51,4 @@ export default class App extends Vue {
   color: inherit !important;
   text-decoration: inherit;
 }
-
 </style>
