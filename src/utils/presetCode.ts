@@ -4,7 +4,7 @@ export const presetCode = [
     description: 'This preset fixes the date taken field for images that are restored from backup for WhatsApp on Android. See the <a href="https://holwech.github.io/blog/Fixing-WhatsApp-Backup/" target="_blank">following article</a> for more information.',
     value: `{
   settings: {
-    re: /(.jpg|.png|.gif|.jpeg)$/,
+    re: /^[^\.].*[_-][0-9]{8}.*(.jpg|.png|.gif|.jpeg)$/,
     pad: function pad(n, width, z) {
       z = z || '0';
       n = n + '';
@@ -13,6 +13,7 @@ export const presetCode = [
   },
   process: (relativePath, entry, content, newZip, settings) => {
     let dateStr = relativePath.split(/[_-]/)[1];
+    if(!dateStr) return;
     let year = parseInt(dateStr.substring(0, 4));
     let month = parseInt(dateStr.substring(4, 6));
     let day = parseInt(dateStr.substring(6));
@@ -40,7 +41,7 @@ export const presetCode = [
     description: 'Removes all EXIF data from all images.',
     value: `{
   settings: {
-    re: /(.jpg|.png|.gif|.jpeg)$/,
+    re: /^[^\.].*[_-][0-9]{8}.*(.jpg|.png|.gif|.jpeg)$/,
   },
   process: (relativePath, entry, content, newZip, settings) => {
     if (!settings.re.test(entry.name)) {
