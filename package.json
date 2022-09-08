@@ -13,7 +13,7 @@
     "codeflask": "^1.4.1",
     "core-js": "^3.3.2",
     "file-saver": "^2.0.2",
-    "jszip": "^3.2.2",
+    "jszip": "^3.7.0",
     "piexif-ts": "^2.0.16",
     "vue": "^2.6.12",
     "vue-class-component": "^7.0.2",
